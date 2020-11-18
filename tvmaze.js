@@ -3,7 +3,7 @@
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
-
+const BASE_URL_SHOWS = 'http://api.tvmaze.com/search/shows';
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -12,27 +12,28 @@ const $searchForm = $("#searchForm");
  *    (if no image URL given by API, put in a default image URL)
  */
 
-async function getShowsByTerm( /* term */) {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
+async function getShowsByTerm(term) {
 
-  return [
-    {
-      id: 1767,
-      name: "The Bletchley Circle",
-      summary:
-        `<p><b>The Bletchley Circle</b> follows the journey of four ordinary 
-           women with extraordinary skills that helped to end World War II.</p>
-         <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their 
-           normal lives, modestly setting aside the part they played in 
-           producing crucial intelligence, which helped the Allies to victory 
-           and shortened the war. When Susan discovers a hidden code behind an
-           unsolved murder she is met by skepticism from the police. She 
-           quickly realises she can only begin to crack the murders and bring
-           the culprit to justice with her former friends.</p>`,
-      image:
-          "http://static.tvmaze.com/uploads/images/medium_portrait/147/369403.jpg"
-    }
-  ]
+  let response = await axios.get(BASE_URL_SHOWS, { params: { q: term } });
+
+  let responseShows = response.data;
+
+  let showsArray = [];
+
+  for (let showData of responseShows) {
+    let id = showData.show.id;
+    let name = showData.show.name;
+    let summary = showData.show.summary;
+    let image = showData.show.image.original;
+    showsArray.push( {
+      id,
+      name,
+      summary,
+      image
+    });
+  }
+
+  return showsArray;
 }
 
 
@@ -43,7 +44,7 @@ function populateShows(shows) {
 
   for (let show of shows) {
     const $show = $(
-        `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
+      `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img 
               src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg" 
@@ -60,7 +61,8 @@ function populateShows(shows) {
        </div>
       `);
 
-    $showsList.append($show);  }
+    $showsList.append($show);
+  }
 }
 
 
