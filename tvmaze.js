@@ -4,6 +4,7 @@ const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const BASE_URL_SHOWS = 'http://api.tvmaze.com/search/shows';
+const DEFAULT_IMG = 'https://tinyurl.com/tv-missing';
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -20,11 +21,15 @@ async function getShowsByTerm(term) {
 
   let showsArray = [];
 
+  // Get the data from each show
   for (let showData of responseShows) {
     let id = showData.show.id;
     let name = showData.show.name;
     let summary = showData.show.summary;
-    let image = showData.show.image.original;
+    let image = (showData.show.image) 
+      ? showData.show.image.original 
+      : DEFAULT_IMG;
+    
     showsArray.push( {
       id,
       name,
@@ -47,8 +52,8 @@ function populateShows(shows) {
       `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img 
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg" 
-              alt="Bletchly Circle San Francisco" 
+              src="${show.image}"
+              alt="${show.name}" 
               class="w-25 mr-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
