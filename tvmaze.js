@@ -4,6 +4,7 @@ const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const BASE_URL_SHOWS = 'http://api.tvmaze.com/search/shows';
+const BASE_URL_EPISODES = 'http://api.tvmaze.com/shows'
 const DEFAULT_IMG = 'https://tinyurl.com/tv-missing';
 
 /** Given a search term, search for tv shows that match that query.
@@ -26,11 +27,11 @@ async function getShowsByTerm(term) {
     let id = showData.show.id;
     let name = showData.show.name;
     let summary = showData.show.summary;
-    let image = (showData.show.image) 
-      ? showData.show.image.original 
+    let image = (showData.show.image)
+      ? showData.show.image.original
       : DEFAULT_IMG;
-    
-    showsArray.push( {
+
+    showsArray.push({
       id,
       name,
       summary,
@@ -93,8 +94,31 @@ $searchForm.on("submit", async function (evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+async function getEpisodesOfShow(id) {
+  let response = await axios.get(`${BASE_URL_EPISODES}/${id}/episodes`);
+  let episodesData = response.data;
 
-/** Write a clear docstring for this function... */
+  return episodesData.map(getEpisodeData)
+}
 
-// function populateEpisodes(episodes) { }
+/* Get specific episode data for a given episode */
+
+function getEpisodeData(episode) {
+  return {
+    id: episode.id,
+    name: episode.name,
+    season: episode.season,
+    number: episode.number
+  }
+}
+
+/* Given an array of episodes information, create HTML element for each and append to #episodesList in DOM */
+
+function populateEpisodes(episodes) {
+  const $episodesList = $('#episodesList');
+
+  for (let episode of episodes) {
+    const $episode = $(`<li>${episode.name} (season ${episode.season}, number ${episode.number})</li>`);
+    $episodesList.append($episode);
+  }
+ }
