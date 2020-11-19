@@ -91,7 +91,7 @@ $searchForm.on("submit", async function (evt) {
 
 
 /** Given a show ID, get from API and return (promise) array of episodes:
- *      { id, name, season, number }
+ *      [{ id, name, season, number }, ...]
  */
 
 async function getEpisodesOfShow(id) {
@@ -116,9 +116,33 @@ function getEpisodeData(episode) {
 
 function populateEpisodes(episodes) {
   const $episodesList = $('#episodesList');
+  $episodesList.empty();
 
   for (let episode of episodes) {
-    const $episode = $(`<li>${episode.name} (season ${episode.season}, number ${episode.number})</li>`);
+    const $episode = $(`<li>${episode.name} 
+    (season ${episode.season}, number ${episode.number})</li>`);
     $episodesList.append($episode);
   }
- }
+
+  $episodesArea.show();
+}
+
+
+/** Called when the episodes button is clicked and gets
+ *  the episodes and places them in the episodes DOM element
+*/
+
+async function getsEpisodesAndDisplay(evt) {
+  let $show = $(evt.target).closest(".Show");
+
+  let id = $show.attr("data-show-id");
+  // let id = $show.data("show-id"); 
+
+  let episodes = await getEpisodesOfShow(id);
+
+  populateEpisodes(episodes);
+}
+
+/** When "Episodes" button is clicked, display the episodes */
+
+$("#showsList").on("click", "button", getsEpisodesAndDisplay);
